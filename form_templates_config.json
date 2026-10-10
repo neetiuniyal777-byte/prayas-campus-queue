@@ -1,0 +1,196 @@
+{
+  "common_fields": [
+    {
+      "key": "full_name",
+      "label": "Full name",
+      "type": "text",
+      "required": true,
+      "validation": "letters and spaces, 3-80 chars"
+    },
+    {
+      "key": "class_year",
+      "label": "Class",
+      "type": "dropdown",
+      "options": [
+        "FE",
+        "SE",
+        "TE",
+        "BE"
+      ],
+      "required": true
+    },
+    {
+      "key": "branch",
+      "label": "Branch",
+      "type": "dropdown",
+      "options": [
+        "Computer Engineering",
+        "IT",
+        "Mechanical",
+        "Civil",
+        "Electrical",
+        "E&TC"
+      ],
+      "required": true
+    },
+    {
+      "key": "tuf_id",
+      "label": "TUF ID",
+      "type": "text",
+      "required": true,
+      "validation": "pattern set by admin"
+    },
+    {
+      "key": "division",
+      "label": "Division / Roll No.",
+      "type": "text",
+      "required": false
+    },
+    {
+      "key": "academic_year",
+      "label": "Academic year",
+      "type": "dropdown",
+      "options": [
+        "2026-27"
+      ],
+      "required": true
+    }
+  ],
+  "services": {
+    "bonafide": {
+      "title": "APPLICATION FOR BONAFIDE CERTIFICATE",
+      "template_ids": [
+        "BON-APP v1",
+        "BON-CERT v1"
+      ],
+      "extra_fields": [
+        {
+          "key": "purpose",
+          "label": "Purpose",
+          "type": "dropdown",
+          "options": [
+            "Scholarship",
+            "Passport",
+            "Bank",
+            "Other"
+          ]
+        },
+        {
+          "key": "copies",
+          "label": "Copies",
+          "type": "number"
+        }
+      ]
+    },
+    "fee_certificate": {
+      "title": "APPLICATION FOR FEE CERTIFICATE",
+      "extra_fields": [
+        {
+          "key": "fee_type",
+          "label": "Fee type (tuition / exam / other)",
+          "type": "text"
+        },
+        {
+          "key": "receipt_no",
+          "label": "Receipt number",
+          "type": "text"
+        },
+        {
+          "key": "purpose",
+          "label": "Purpose",
+          "type": "text"
+        }
+      ]
+    },
+    "fee_query": {
+      "title": "FEE QUERY FORM",
+      "extra_fields": [
+        {
+          "key": "category",
+          "label": "Query category",
+          "type": "text"
+        },
+        {
+          "key": "receipt_no",
+          "label": "Receipt number (if any)",
+          "type": "text"
+        },
+        {
+          "key": "details",
+          "label": "Query details",
+          "type": "text"
+        }
+      ]
+    },
+    "exam_form_correction": {
+      "title": "EXAMINATION FORM CORRECTION REQUEST",
+      "extra_fields": [
+        {
+          "key": "session",
+          "label": "Exam session",
+          "type": "text"
+        },
+        {
+          "key": "seat_no",
+          "label": "Seat number",
+          "type": "text"
+        },
+        {
+          "key": "field",
+          "label": "Field to correct",
+          "type": "text"
+        },
+        {
+          "key": "correct_value",
+          "label": "Correct value",
+          "type": "text"
+        }
+      ]
+    },
+    "document_verification": {
+      "title": "DOCUMENT VERIFICATION REQUEST",
+      "extra_fields": [
+        {
+          "key": "doc_type",
+          "label": "Document type",
+          "type": "text"
+        },
+        {
+          "key": "issuer",
+          "label": "Issuing body",
+          "type": "text"
+        },
+        {
+          "key": "count",
+          "label": "Number of documents",
+          "type": "text"
+        },
+        {
+          "key": "purpose",
+          "label": "Purpose",
+          "type": "text"
+        }
+      ]
+    },
+    "duplicate_marksheet": {
+      "title": "REQUEST FOR DUPLICATE MARKSHEET / TRANSCRIPT",
+      "extra_fields": [
+        {
+          "key": "semester",
+          "label": "Semester",
+          "type": "text"
+        },
+        {
+          "key": "reason",
+          "label": "Reason (lost / damaged)",
+          "type": "text"
+        },
+        {
+          "key": "copies",
+          "label": "Number of copies",
+          "type": "text"
+        }
+      ]
+    }
+  }
+}
