@@ -20,7 +20,7 @@ export default function AdminDataViewerPage() {
   const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"services" | "tokens" | "applications" | "tokenEvents" | "auditLog">("tokens");
+  const [activeTab, setActiveTab] = useState<"services" | "tokens" | "applications" | "tokenEvents" | "auditLog" | "students">("tokens");
   const [search, setSearch] = useState("");
 
   function loadData() {
@@ -65,6 +65,13 @@ export default function AdminDataViewerPage() {
 
           <div className="flex items-center space-x-2">
             <Link
+              href="/admin/students"
+              className="text-xs font-semibold px-3 py-1.5 rounded border border-[#cbd5e1] hover:bg-[#f1f5f9] text-[#0f172a] flex items-center space-x-1"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>Students Directory</span>
+            </Link>
+            <Link
               href="/admin/qr"
               className="text-xs font-semibold px-3 py-1.5 rounded border border-[#cbd5e1] hover:bg-[#f1f5f9] text-[#0f172a] flex items-center space-x-1"
             >
@@ -89,6 +96,7 @@ export default function AdminDataViewerPage() {
             {[
               { id: "tokens", label: "Tokens" },
               { id: "applications", label: "Applications" },
+              { id: "students", label: "Students" },
               { id: "services", label: "Services" },
               { id: "tokenEvents", label: "Token Events" },
               { id: "auditLog", label: "Audit Log" },

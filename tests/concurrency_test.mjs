@@ -7,10 +7,22 @@
 
 const BASE_URL = process.env.TEST_APP_URL || "http://localhost:3000";
 
+const args = process.argv.slice(2);
+if (!args.includes("--run-test") && process.env.ALLOW_CONCURRENCY_TEST !== "true") {
+  console.warn("================================================================================");
+  console.warn("SAFETY WARNING: Concurrency test creates 50 test tokens and records.");
+  console.warn("To prevent accidental load/pollution on production data, you must provide the flag:");
+  console.warn("  node tests/concurrency_test.mjs --run-test");
+  console.warn("Or set env variable: ALLOW_CONCURRENCY_TEST=true");
+  console.warn("================================================================================");
+  process.exit(1);
+}
+
 async function runConcurrencyTest() {
   console.log("=================================================");
   console.log("Starting Concurrency Test: 50 Simultaneous Token Requests");
   console.log(`Target URL: ${BASE_URL}/api/applications`);
+  console.log("Flag --run-test verified.");
   console.log("=================================================\n");
 
   const REQUEST_COUNT = 50;

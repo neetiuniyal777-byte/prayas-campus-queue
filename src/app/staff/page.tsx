@@ -69,6 +69,13 @@ export default function StaffDashboardPage() {
           .channel("staff_queue_realtime")
           .on(
             "postgres_changes",
+            { event: "*", schema: "public", table: "public_queue_state" },
+            () => {
+              loadQueue();
+            }
+          )
+          .on(
+            "postgres_changes",
             { event: "*", schema: "public", table: "tokens" },
             () => {
               loadQueue();

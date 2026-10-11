@@ -101,14 +101,14 @@ export default function TokenTrackingPage() {
           .channel(`token_realtime_${trackingId}`)
           .on(
             "postgres_changes",
-            { event: "*", schema: "public", table: "tokens" },
+            { event: "*", schema: "public", table: "public_queue_state" },
             () => {
               fetchStatus();
             }
           )
           .on(
             "postgres_changes",
-            { event: "*", schema: "public", table: "applications" },
+            { event: "*", schema: "public", table: "tokens" },
             () => {
               fetchStatus();
             }

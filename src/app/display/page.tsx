@@ -39,14 +39,7 @@ export default function PublicDisplayPage() {
           .channel("display_queue_realtime")
           .on(
             "postgres_changes",
-            { event: "*", schema: "public", table: "tokens" },
-            () => {
-              loadQueueState();
-            }
-          )
-          .on(
-            "postgres_changes",
-            { event: "*", schema: "public", table: "services" },
+            { event: "*", schema: "public", table: "public_queue_state" },
             () => {
               loadQueueState();
             }

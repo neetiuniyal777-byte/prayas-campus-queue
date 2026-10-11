@@ -12,12 +12,13 @@ export async function GET(request: NextRequest) {
   const { adminClient } = auth;
 
   try {
-    const [services, tokens, applications, tokenEvents, auditLog] = await Promise.all([
+    const [services, tokens, applications, tokenEvents, auditLog, students] = await Promise.all([
       adminClient.from("services").select("*").order("sort_order"),
       adminClient.from("tokens").select("*").order("issued_at", { ascending: false }).limit(50),
       adminClient.from("applications").select("*").order("created_at", { ascending: false }).limit(50),
       adminClient.from("token_events").select("*").order("created_at", { ascending: false }).limit(50),
       adminClient.from("audit_log").select("*").order("created_at", { ascending: false }).limit(50),
+      adminClient.from("students").select("*").order("created_at", { ascending: false }).limit(50),
     ]);
 
     return NextResponse.json({
@@ -26,6 +27,7 @@ export async function GET(request: NextRequest) {
       applications: applications.data || [],
       tokenEvents: tokenEvents.data || [],
       auditLog: auditLog.data || [],
+      students: students.data || [],
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
