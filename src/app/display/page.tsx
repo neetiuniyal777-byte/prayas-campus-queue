@@ -11,6 +11,7 @@ interface DisplayService {
   current_token?: string | null;
   current_counter?: string | null;
   waiting_count: number;
+  next_labels?: string[];
 }
 
 export default function PublicDisplayPage() {
@@ -142,12 +143,31 @@ export default function PublicDisplayPage() {
             </div>
 
             {/* Oversized Now Serving Token (Legible from 10m) */}
-            <div className="py-8 text-center bg-[#090d16] border border-slate-800 rounded-lg my-4">
+            <div className="py-6 text-center bg-[#090d16] border border-slate-800 rounded-lg my-3">
               <div className="text-[11px] uppercase font-bold text-slate-400 tracking-wider mb-1">
                 Now Serving
               </div>
-              <div className="text-7xl font-extrabold text-emerald-400 font-mono tracking-tight">
+              <div className="text-6xl sm:text-7xl font-extrabold text-emerald-400 font-mono tracking-tight">
                 {service.current_token || `${service.prefix}-001`}
+              </div>
+            </div>
+
+            {/* Next 3 Upcoming Tokens Strip */}
+            <div className="mb-3 px-3 py-2 rounded bg-[#090d16] border border-slate-800 flex items-center justify-between text-xs">
+              <span className="text-[11px] uppercase font-bold text-slate-400">Next In Line:</span>
+              <div className="flex items-center space-x-1.5 font-mono">
+                {service.next_labels && service.next_labels.length > 0 ? (
+                  service.next_labels.slice(0, 3).map((lbl, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2 py-0.5 rounded text-[11px] font-bold bg-[#1e293b] text-amber-300 border border-slate-700"
+                    >
+                      {lbl}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-[11px] text-slate-500 font-sans italic">None waiting</span>
+                )}
               </div>
             </div>
 
