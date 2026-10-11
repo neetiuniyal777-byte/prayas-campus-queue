@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { Clock, Monitor, RefreshCw } from "lucide-react";
+import Image from "next/image";
+import { COLLEGE_CONFIG } from "@/config/college";
 
 interface DisplayService {
   id: string;
@@ -17,7 +17,7 @@ export default function PublicDisplayPage() {
   const [services, setServices] = useState<DisplayService[]>([]);
   const [currentTime, setCurrentTime] = useState("");
 
-  function loadState() {
+  function loadQueueState() {
     fetch("/api/services")
       .then((res) => res.json())
       .then((data) => {
@@ -26,9 +26,10 @@ export default function PublicDisplayPage() {
       .catch(() => {});
   }
 
+  // Poll every 3 seconds for instant desk sync
   useEffect(() => {
-    loadState();
-    const interval = setInterval(loadState, 4000);
+    loadQueueState();
+    const interval = setInterval(loadQueueState, 3000);
     return () => clearInterval(interval);
   }, []);
 
@@ -49,73 +50,80 @@ export default function PublicDisplayPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col justify-between p-6 sm:p-10 select-none">
-      {/* Top Kiosk Header */}
+    <div className="min-h-screen bg-[#090d16] text-white flex flex-col justify-between p-6 sm:p-10 select-none">
+      {/* Kiosk Header */}
       <header className="flex items-center justify-between border-b border-slate-800 pb-6">
-        <div className="flex items-center space-x-4">
-          <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center font-extrabold text-2xl shadow-lg shadow-blue-500/20">
-            PQ
+        <div className="flex items-center space-x-5">
+          <div className="relative w-16 h-16 rounded-lg bg-white p-2 flex items-center justify-center flex-shrink-0">
+            <Image
+              src="/logo.png"
+              alt={COLLEGE_CONFIG.name}
+              width={54}
+              height={54}
+              className="object-contain"
+              priority
+            />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              CAMPUS ADMINISTRATIVE OFFICE
+            <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white uppercase">
+              {COLLEGE_CONFIG.name}
             </h1>
-            <p className="text-sm text-slate-400">LIVE QUEUE & SERVICE TOKEN DISPLAY</p>
+            <p className="text-xs text-slate-400 font-semibold tracking-wider uppercase mt-0.5">
+              {COLLEGE_CONFIG.officeName}
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-6 text-right">
-          <div>
-            <div className="text-2xl sm:text-3xl font-mono font-bold text-blue-400">
-              {currentTime}
-            </div>
-            <div className="text-xs text-slate-400">
-              {new Date().toLocaleDateString("en-IN", {
-                weekday: "long",
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
-            </div>
+        <div className="text-right">
+          <div className="text-3xl font-mono font-extrabold text-[#60a5fa] tracking-wider">
+            {currentTime}
+          </div>
+          <div className="text-xs text-slate-400 mt-0.5 uppercase tracking-wider">
+            {new Date().toLocaleDateString("en-IN", {
+              weekday: "long",
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
           </div>
         </div>
       </header>
 
-      {/* Main Boards Grid */}
+      {/* Main Boards Grid (Matching Reference Diagram Section 6) */}
       <main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 my-8 flex-1">
         {services.map((service) => (
           <div
             key={service.prefix}
-            className="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col justify-between shadow-xl relative overflow-hidden"
+            className="bg-[#0f172a] border border-slate-800 rounded-xl p-6 flex flex-col justify-between shadow-lg relative"
           >
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-400 px-2.5 py-1 rounded-full bg-blue-950 border border-blue-800/50">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#93c5fd] px-2.5 py-1 rounded bg-[#1e293b] border border-slate-700">
                   Service {service.prefix}
                 </span>
-                <span className="text-xs text-slate-400">
-                  Waiting: <strong className="text-white">{service.waiting_count}</strong>
+                <span className="text-xs font-semibold text-slate-400">
+                  Waiting: <strong className="text-white font-mono">{service.waiting_count}</strong>
                 </span>
               </div>
-              <h2 className="text-lg font-bold text-white truncate">
+              <h2 className="text-base font-bold text-white truncate">
                 {service.name}
               </h2>
             </div>
 
-            {/* Now Serving Big Display */}
-            <div className="py-6 text-center">
-              <div className="text-xs uppercase font-extrabold text-slate-400 tracking-wider mb-1">
+            {/* Oversized Now Serving Token (Legible from 10m) */}
+            <div className="py-8 text-center bg-[#090d16] border border-slate-800 rounded-lg my-4">
+              <div className="text-[11px] uppercase font-bold text-slate-400 tracking-wider mb-1">
                 Now Serving
               </div>
-              <div className="text-6xl sm:text-7xl font-extrabold text-emerald-400 font-mono tracking-tight">
+              <div className="text-7xl font-extrabold text-emerald-400 font-mono tracking-tight">
                 {service.current_token || `${service.prefix}-001`}
               </div>
             </div>
 
-            {/* Counter Label */}
-            <div className="bg-slate-950 border border-slate-800 rounded-2xl p-3 flex items-center justify-between text-xs">
-              <span className="text-slate-400">Assigned Counter:</span>
-              <span className="font-bold text-blue-300">
+            {/* Counter Assignment Block */}
+            <div className="bg-[#1e293b] border border-slate-700 rounded-lg p-3 flex items-center justify-between text-xs">
+              <span className="text-slate-300 font-medium">Assigned Window:</span>
+              <span className="font-bold text-[#60a5fa] font-mono text-sm">
                 {service.current_counter || "Counter 1"}
               </span>
             </div>
@@ -123,15 +131,17 @@ export default function PublicDisplayPage() {
         ))}
       </main>
 
-      {/* Ticker Footer */}
+      {/* Announcements Ticker (Section 6) */}
       <footer className="border-t border-slate-800 pt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-3">
         <div className="flex items-center space-x-2">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Notice: Please keep your original documents ready when your token is called.</span>
+          <span className="text-slate-300 font-medium">
+            Attention Students: Please present your original College Identity Card and fee receipts at the designated counter.
+          </span>
         </div>
-        <Link href="/" className="hover:text-slate-200 underline text-[11px]">
-          Student Portal
-        </Link>
+        <div className="text-[11px] text-slate-500 font-mono">
+          System Operational • Zero Data Exposure
+        </div>
       </footer>
     </div>
   );

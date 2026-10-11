@@ -1,5 +1,5 @@
 -- =====================================================================
--- PRAYAS CAMPUS QUEUE: CREATE / PROMOTE ADMIN PROFILE
+-- TERNA AUTONOMOUS ENGINEERING COLLEGE: CREATE / PROMOTE ADMIN PROFILE
 -- Run this in the Supabase SQL Editor AFTER signing up / creating
 -- a user under Supabase Authentication -> Users.
 -- =====================================================================

@@ -1,5 +1,6 @@
 -- =====================================================================
--- PRAYAS CAMPUS QUEUE & TOKEN SYSTEM
+-- TERNA AUTONOMOUS ENGINEERING COLLEGE
+-- CAMPUS QUEUE & DIGITAL TOKEN SYSTEM
 -- MASTER SETUP SCRIPT (Run in Supabase SQL Editor)
 -- Follows PRD.md Section 9 & 10 and RULES.md
 -- =====================================================================
