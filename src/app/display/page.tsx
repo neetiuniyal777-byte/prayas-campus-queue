@@ -26,11 +26,49 @@ export default function PublicDisplayPage() {
       .catch(() => {});
   }
 
-  // Poll every 3 seconds for instant desk sync
+  // Supabase Realtime subscription with 8-second polling fallback
   useEffect(() => {
     loadQueueState();
-    const interval = setInterval(loadQueueState, 3000);
-    return () => clearInterval(interval);
+
+    let channel: any = null;
+    try {
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        const { createClient } = require("@/lib/supabase/client");
+        const supabase = createClient();
+        channel = supabase
+          .channel("display_queue_realtime")
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "tokens" },
+            () => {
+              loadQueueState();
+            }
+          )
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "services" },
+            () => {
+              loadQueueState();
+            }
+          )
+          .subscribe();
+      }
+    } catch {
+      // Fallback cleanly to polling if Realtime connection fails
+    }
+
+    // 8-second polling fallback
+    const interval = setInterval(loadQueueState, 8000);
+
+    return () => {
+      clearInterval(interval);
+      if (channel) {
+        try {
+          const { createClient } = require("@/lib/supabase/client");
+          createClient().removeChannel(channel);
+        } catch {}
+      }
+    };
   }, []);
 
   useEffect(() => {

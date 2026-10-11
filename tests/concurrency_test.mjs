@@ -16,10 +16,11 @@ async function runConcurrencyTest() {
   const REQUEST_COUNT = 50;
   const requests = [];
 
+  const runId = Date.now().toString().slice(-4);
   for (let i = 1; i <= REQUEST_COUNT; i++) {
     const letters = ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliet"];
     const nameWord = letters[i % letters.length] + " " + letters[(i * 3) % letters.length];
-    const studentTufId = `TUF2026_${String(i).padStart(3, "0")}`;
+    const studentTufId = `TUF_${runId}_${String(i).padStart(3, "0")}`;
     const payload = {
       serviceSlug: "bonafide",
       fullName: `Student ${nameWord}`,

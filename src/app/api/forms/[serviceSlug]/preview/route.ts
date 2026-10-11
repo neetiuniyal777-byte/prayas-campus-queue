@@ -15,10 +15,21 @@ const previewRequestSchema = z.object({
   extraFields: z.record(z.any()).optional(),
 });
 
+import { checkDbRateLimit } from "@/lib/rateLimit";
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { serviceSlug: string } }
 ) {
+  const ip = request.ip || request.headers.get("x-forwarded-for") || "anonymous_client";
+  const rateResult = await checkDbRateLimit(`rate:preview:ip:${ip}`, 45, 60);
+  if (!rateResult.success) {
+    return NextResponse.json(
+      { error: "Too many preview requests. Please wait a moment." },
+      { status: 429 }
+    );
+  }
+
   const service = SERVICES_CONFIG[params.serviceSlug];
   if (!service) {
     return NextResponse.json({ error: "Service not found" }, { status: 404 });

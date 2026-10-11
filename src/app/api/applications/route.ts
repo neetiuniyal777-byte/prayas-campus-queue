@@ -26,8 +26,21 @@ const submitApplicationSchema = z.object({
   extraFields: z.record(z.any()).default({}),
 });
 
+import { checkDbRateLimit } from "@/lib/rateLimit";
+
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.ip || request.headers.get("x-forwarded-for") || "anonymous_client";
+
+    // 1. Database-backed rate limiting per IP (max 30 token creations per 60 seconds)
+    const ipLimit = await checkDbRateLimit(`rate:token:ip:${ip}`, 30, 60);
+    if (!ipLimit.success) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Please wait a minute before requesting another token." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const result = submitApplicationSchema.safeParse(body);
 

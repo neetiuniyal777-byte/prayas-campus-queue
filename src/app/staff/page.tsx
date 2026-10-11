@@ -58,8 +58,41 @@ export default function StaffDashboardPage() {
 
   useEffect(() => {
     loadQueue();
-    const interval = setInterval(loadQueue, 5000);
-    return () => clearInterval(interval);
+
+    // 1. Supabase Realtime subscription for live queue events
+    let channel: any = null;
+    try {
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        const { createClient } = require("@/lib/supabase/client");
+        const supabase = createClient();
+        channel = supabase
+          .channel("staff_queue_realtime")
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "tokens" },
+            () => {
+              loadQueue();
+            }
+          )
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "token_events" },
+            () => {
+              loadQueue();
+            }
+          )
+          .subscribe();
+      }
+    } catch (err) {
+      console.error("Staff realtime error:", err);
+    }
+
+    // 2. Polling fallback (every 8 seconds)
+    const interval = setInterval(loadQueue, 8000);
+    return () => {
+      clearInterval(interval);
+      if (channel) channel.unsubscribe();
+    };
   }, []);
 
   async function handleCallNext() {

@@ -205,6 +205,13 @@ CREATE TABLE audit_log (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Rate Limits (Persistent database-backed limiter for serverless / Vercel)
+CREATE TABLE rate_limits (
+  key TEXT PRIMARY KEY,
+  window_start TIMESTAMPTZ NOT NULL DEFAULT now(),
+  count INTEGER NOT NULL DEFAULT 1
+);
+
 -- 4. INDEXES & CONSTRAINTS
 -- Fast queue lookups
 CREATE INDEX idx_tokens_queue ON tokens (service_id, service_date, status, number);
@@ -230,6 +237,7 @@ ALTER TABLE tokens ENABLE ROW LEVEL SECURITY;
 ALTER TABLE token_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE announcements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rate_limits ENABLE ROW LEVEL SECURITY;
 
 -- Helper function: Is current authenticated user an admin?
 CREATE OR REPLACE FUNCTION is_admin()
@@ -699,6 +707,40 @@ BEGIN
     'date', v_today,
     'services', COALESCE(v_services, '[]'::JSONB)
   );
+END;
+$$;
+
+-- FUNCTION: check_rate_limit
+-- Database-backed atomic rate limiter for serverless environments (Vercel)
+CREATE OR REPLACE FUNCTION check_rate_limit(
+  p_key TEXT,
+  p_limit INTEGER,
+  p_window_seconds INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_now TIMESTAMPTZ := clock_timestamp();
+  v_count INTEGER;
+BEGIN
+  INSERT INTO rate_limits (key, window_start, count)
+  VALUES (p_key, v_now, 1)
+  ON CONFLICT (key) DO UPDATE
+  SET 
+    count = CASE 
+      WHEN (v_now - rate_limits.window_start) > (p_window_seconds || ' seconds')::INTERVAL THEN 1
+      ELSE rate_limits.count + 1
+    END,
+    window_start = CASE
+      WHEN (v_now - rate_limits.window_start) > (p_window_seconds || ' seconds')::INTERVAL THEN v_now
+      ELSE rate_limits.window_start
+    END
+  RETURNING count INTO v_count;
+
+  RETURN (v_count <= p_limit);
 END;
 $$;
 

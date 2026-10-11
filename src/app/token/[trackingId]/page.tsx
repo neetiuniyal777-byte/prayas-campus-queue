@@ -87,11 +87,47 @@ export default function TokenTrackingPage() {
     } catch {}
   }
 
-  // Poll every 4 seconds + Supabase Realtime channel setup
+  // Supabase Realtime channel with 8-second polling fallback
   useEffect(() => {
     fetchStatus();
-    const interval = setInterval(fetchStatus, 4000);
-    return () => clearInterval(interval);
+
+    // 1. Supabase Realtime Subscription
+    let channel: any = null;
+    try {
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        const { createClient } = require("@/lib/supabase/client");
+        const supabase = createClient();
+        channel = supabase
+          .channel(`token_realtime_${trackingId}`)
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "tokens" },
+            () => {
+              fetchStatus();
+            }
+          )
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "applications" },
+            () => {
+              fetchStatus();
+            }
+          )
+          .subscribe();
+      }
+    } catch (err) {
+      console.error("Realtime subscription error:", err);
+    }
+
+    // 2. Polling Fallback (every 8 seconds in case WebSocket drops or reconnects)
+    const interval = setInterval(fetchStatus, 8000);
+
+    return () => {
+      clearInterval(interval);
+      if (channel) {
+        channel.unsubscribe();
+      }
+    };
   }, [trackingId]);
 
   function copyTrackingLink() {
