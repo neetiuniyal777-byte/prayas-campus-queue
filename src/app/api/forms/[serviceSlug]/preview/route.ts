@@ -71,3 +71,43 @@ export async function POST(
     );
   }
 }
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { serviceSlug: string } }
+) {
+  const service = SERVICES_CONFIG[params.serviceSlug];
+  if (!service) {
+    return NextResponse.json({ error: "Service not found" }, { status: 404 });
+  }
+
+  try {
+    const pdfBytes = await generateApplicationPdf({
+      serviceTitle: service.title,
+      serviceSlug: service.slug,
+      isBlank: false,
+      studentDetails: {
+        fullName: "Sample Student",
+        tufId: "TUF2026_PREVIEW",
+        classYear: "FE",
+        branch: "Computer Engineering",
+        academicYear: "2026-27",
+      },
+      extraFields: {},
+    });
+
+    return new NextResponse(pdfBytes, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `inline; filename="${service.slug}_preview.pdf"`,
+      },
+    });
+  } catch (error) {
+    console.error("Preview GET generation failed:", error);
+    return NextResponse.json(
+      { error: "Failed to generate preview form" },
+      { status: 500 }
+    );
+  }
+}

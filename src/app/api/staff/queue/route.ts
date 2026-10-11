@@ -10,7 +10,9 @@ export async function GET(request: NextRequest) {
   }
 
   const { adminClient } = auth;
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+  }).format(new Date());
 
   try {
     // 1. Fetch counters

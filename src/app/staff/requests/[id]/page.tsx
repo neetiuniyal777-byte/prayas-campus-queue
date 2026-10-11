@@ -137,19 +137,29 @@ export default function ApplicationReviewPage() {
                 <h3 className="text-sm font-bold text-[#0f172a]">Auto-Filled Application PDF</h3>
                 <p className="text-[11px] text-[#64748b]">Generated on server in official university format</p>
               </div>
-              <a
-                href={`/api/forms/${app?.services?.slug || "bonafide"}/preview`}
-                target="_blank"
-                className="text-xs font-semibold text-[#1d4ed8] hover:underline flex items-center space-x-1"
-              >
-                <span>Full Screen</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
+              <div className="flex items-center space-x-2">
+                <a
+                  href={`/api/staff/applications/${appId}/pdf`}
+                  download={`Application_${app?.tuf_id || "form"}.pdf`}
+                  className="text-xs font-semibold px-2 py-1 rounded border border-[#cbd5e1] hover:bg-[#f1f5f9] text-[#0f172a] flex items-center space-x-1"
+                >
+                  <Download className="w-3 h-3" />
+                  <span>Download</span>
+                </a>
+                <a
+                  href={`/api/staff/applications/${appId}/pdf`}
+                  target="_blank"
+                  className="text-xs font-semibold text-[#1d4ed8] hover:underline flex items-center space-x-1"
+                >
+                  <span>Full Screen</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
             </div>
 
             <div className="border border-[#e2e8f0] rounded bg-[#f8fafc] h-[550px] overflow-hidden flex items-center justify-center">
               <iframe
-                src={`/api/forms/${app?.services?.slug || "bonafide"}/preview`}
+                src={`/api/staff/applications/${appId}/pdf`}
                 title="Application Form Preview"
                 className="w-full h-full border-none"
               />
